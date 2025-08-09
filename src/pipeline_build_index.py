@@ -12,7 +12,7 @@ def main():
 
     # 1. Carregar corpus (usa processed se existir, senão raw)
     corpus = io_utils.load_corpus(path_raw, path_processed)
-    texts = [preprocess.normalize_text(doc["text"]) for doc in corpus]
+    texts = [preprocess.normalize(doc["text"]) for doc in corpus]
     id_map = [doc["doc_id"] for doc in corpus]
 
     # 2. Índice léxico (TF-IDF)

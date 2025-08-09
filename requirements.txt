@@ -1,5 +1,8 @@
-fastapi
-uvicorn[standard]
-pytest
-httpx
-sklearn
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+sentence-transformers==2.7.0
+streamlit==1.36.0
+fastapi==0.110.2
+uvicorn==0.29.0
+pytest==8.2.2

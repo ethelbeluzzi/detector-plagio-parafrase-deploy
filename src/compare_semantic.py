@@ -14,7 +14,7 @@ def embed_texts(texts: List[str], model_name: str) -> np.ndarray:
     """
     Gera embeddings normalizados (L2) para uma lista de textos.
     """
-    model = _get_model(model_name)
+    model = SentenceTransformer("/app/models/paraphrase-multilingual-MiniLM-L12-v2")
     emb = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
     return emb
 

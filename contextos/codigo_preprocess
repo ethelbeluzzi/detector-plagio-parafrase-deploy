@@ -10,67 +10,74 @@ O projeto foi pensado para rodar **tanto localmente quanto via Docker**, garanti
 
 ---
 
-import pytest
-from src import preprocess
+from typing import List, Dict
 
 
-# 🔹 Testa divisão simples de palavras preservando pontuação e capitalização
-def test_split_words_basic():
-    text = "Olá, Mundo!"
-    words = preprocess._split_words(text)
-    assert words == ["Olá,", "Mundo!"]
-
-# 🔹 Testa divisão com string vazia
-def test_split_words_empty():
-    assert preprocess._split_words("") == []
-
-
-# 🔹 Testa construção de janelas com stride menor que window_size
-def test_build_windows_stride_small():
-    text = "um dois três quatro cinco seis"
-    result = preprocess.build_windows(text, window_size=3, stride=2)
-    assert len(result) > 0
-    # Primeira janela
-    assert result[0]["text"] == "um dois três"
-    assert result[0]["start_word"] == 0
-    assert result[0]["end_word"] == 3
-    # Segunda janela deve começar no índice 2
-    assert result[1]["start_word"] == 2
+def _split_words(text: str) -> List[str]:
+    """
+    Divide por espaços preservando pontuação e capitalização.
+    Não normaliza: queremos maximizar a detecção literal no léxico.
+    """
+    if not text:
+        return []
+    # Simplíssimo e intencional: manter o texto “como veio”
+    # Caso queira tratar múltiplos espaços, o split já lida.
+    return text.split()
 
 
-# 🔹 Testa construção de janelas com stride igual ao window_size
-def test_build_windows_stride_equals_window():
-    text = "a b c d e f"
-    result = preprocess.build_windows(text, window_size=2, stride=2)
-    assert len(result) == 3  # 6 palavras / 2 por janela
-    assert result[0]["text"] == "a b"
-    assert result[1]["text"] == "c d"
-    assert result[2]["text"] == "e f"
+def build_windows(
+    text: str,
+    window_size: int,
+    stride: int
+) -> List[Dict]:
+    """
+    Constrói janelas deslizantes em unidades de palavras.
+    Retorna lista de dicts com:
+      - bloco_id: índice sequencial
+      - start_word: início (índice de palavra, inclusive)
+      - end_word: fim (índice de palavra, exclusivo)
+      - text: texto do bloco (reconstruído com espaços)
+    """
+    words = _split_words(text)
+    n = len(words)
+    windows: List[Dict] = []
+
+    if n == 0 or window_size <= 0:
+        return windows
+
+    bloco_id = 0
+    i = 0
+    while i < n:
+        start = i
+        end = min(i + window_size, n)
+        chunk_text = " ".join(words[start:end]).strip()
+        if chunk_text:
+            windows.append({
+                "bloco_id": bloco_id,
+                "start_word": start,
+                "end_word": end,
+                "text": chunk_text,
+            })
+            bloco_id += 1
+        if end == n:
+            break
+        i += stride if stride > 0 else window_size
+
+    return windows
 
 
-# 🔹 Testa construção de janelas quando window_size é maior que número de palavras
-def test_build_windows_window_size_large():
-    text = "um dois três"
-    result = preprocess.build_windows(text, window_size=10, stride=1)
-    assert len(result) == 1
-    assert result[0]["text"] == "um dois três"
-
-
-# 🔹 Testa comportamento com texto vazio ou window_size <= 0
-def test_build_windows_edge_cases():
-    assert preprocess.build_windows("", window_size=3, stride=1) == []
-    assert preprocess.build_windows("texto", window_size=0, stride=1) == []
-
-
-# 🔹 Testa extensão de contexto com margem dentro dos limites
-def test_extend_context_basic():
-    text = "um dois três quatro cinco"
-    result = preprocess.extend_context(text, start_word=1, end_word=3, margin=1)
-    assert result == "um dois três quatro"
-
-
-# 🔹 Testa extensão de contexto com margem que ultrapassa limites do texto
-def test_extend_context_limits():
-    text = "um dois três"
-    result = preprocess.extend_context(text, start_word=0, end_word=2, margin=5)
-    assert result == "um dois três"
+def extend_context(
+    text: str,
+    start_word: int,
+    end_word: int,
+    margin: int
+) -> str:
+    """
+    Retorna o trecho do texto cobrindo [start_word - margin, end_word + margin],
+    limitado aos limites do texto.
+    """
+    words = _split_words(text)
+    n = len(words)
+    s = max(0, start_word - margin)
+    e = min(n, end_word + margin)
+    return " ".join(words[s:e]).strip()

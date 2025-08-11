@@ -110,7 +110,7 @@ Pergunta: {user_question}
 """
                 else:
                     prompt = f"""
-Responda de forma técnica, objetiva e detalhada, com base apenas no texto abaixo:
+Responda de forma técnica, objetiva e detalhada, como engenheiro de IA, com base apenas no texto abaixo:
 ---
 {contextos.get(contexto_escolhido, '')}
 ---

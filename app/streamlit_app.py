@@ -43,9 +43,9 @@ def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None
     repo = g.get_repo(repo_name)
     # Escapa quebras de linha e vírgulas básicas
     def _clean(s) -> str:
-    if s is None:
-        return ""
-    return str(s).replace("\n", " ").replace("\r", " ").replace(",", " ").strip()
+        if s is None:
+            return ""
+        return str(s).replace("\n", " ").replace("\r", " ").replace(",", " ").strip()
 
     nova_linha = f"{_clean(area)},{_clean(modo)},{_clean(pergunta)},{_clean(resposta)}\n"
 

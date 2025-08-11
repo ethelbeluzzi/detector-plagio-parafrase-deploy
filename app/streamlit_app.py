@@ -354,7 +354,7 @@ def main():
       <div class="left-group">
         <div class="app-title">Case Técnico - Ethel Beluzzi</div>
         <div class="author-box">
-          <span>Quer saber mais? sobre a autora?</span>
+          <span>Quer saber mais sobre a autora?</span>
           <a href="http://lattes.cnpq.br/8943675734808684" target="_blank" title="Currículo Lattes">📄</a>
           <a href="https://www.linkedin.com/in/ethelpanitsabeluzzi/" target="_blank" title="LinkedIn">
             <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" width="18" height="18">

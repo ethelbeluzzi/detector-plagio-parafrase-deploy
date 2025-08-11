@@ -1,0 +1,13 @@
+## Seleção da Base de Comparação
+
+Para compor a base pública do projeto, optou-se por utilizar textos brutos obtidos da **Wikipédia em português**, por meio de um script automatizado que consulta a API pública da plataforma.  
+
+O ponto de partida foram temas relacionados aos assuntos das últimas redações do ENEM — como questões sociais, culturais e políticas. A partir desses artigos iniciais (*seeds*), o script percorreu links internos para ampliar o conjunto até atingir aproximadamente 200 documentos (neste caso, 174).  
+
+Essa abordagem garante:  
+- **Diversidade temática** e relevância educacional.  
+- **Conformidade legal**, utilizando apenas conteúdo de domínio público.  
+- **Escopo controlado**, atendendo ao requisito de uma base pequena (100–200 textos).
+
+**Exemplos de seeds utilizados:**  
+Trabalho doméstico, Trabalho de cuidado, Mulheres no Brasil, Igualdade de gênero, Povos e comunidades tradicionais, Povos indígenas do Brasil, Quilombolas, Registro civil, Cidadania, Direitos humanos no Brasil, Estigma associado às doenças mentais, Saúde mental no Brasil, Suicídio, Depressão, Democratização do acesso ao cinema, Cinema do Brasil, Política cultural do Brasil, Dados pessoais, Privacidade na Internet, Proteção de dados no Brasil, Lei Geral de Proteção de Dados, Educação de surdos, Língua brasileira de sinais, Acessibilidade, Intolerância religiosa no Brasil, Liberdade religiosa, Violência contra a mulher no Brasil, Lei Maria da Penha, Publicidade infantil, Direito do consumidor no Brasil, Lei Seca, Álcool e direção, Imigração no Brasil, Refugiados no Brasil, Redes sociais, Cultura digital, Desinformação, Fake news, Democracia no Brasil, Participação política, Mobilidade urbana, Meio ambiente no Brasil, Sustentabilidade, Racismo no Brasil, Inclusão social, Desigualdade social no Brasil, Educação no Brasil, Bullying, Trabalho infantil no Brasil, Ética.

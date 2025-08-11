@@ -22,17 +22,6 @@ cd detector-plagio-parafrase
 
 ---
 
-
-### 📥 Copiar o repositório para o seu computador
-Primeiro, é necessário copiar o repositório. Depois, você pode escolher rodar **localmente** ou com **Docker**.
-
-```bash
-git clone https://github.com/ethelbeluzzi/detector-plagio-parafrase.git
-cd detector-plagio-parafrase
-```
-
----
-
 ### 💻 1) Rodar localmente
 
 *Criar ambiente virtual:*

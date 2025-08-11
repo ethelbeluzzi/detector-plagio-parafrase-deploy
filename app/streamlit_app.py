@@ -138,7 +138,7 @@ def _build_top_blocks_df(resultados: List[Dict], limit: int = 5) -> pd.DataFrame
 # ========= App =========
 
 def main():
-    st.set_page_config(page_title="Plágio Similarity", layout="wide")
+    st.set_page_config(page_title="Case Tecnico - Ethel", layout="wide")
 
     # Carrega logo em base64
     logo_file = ROOT / "app" / "letrus.png"

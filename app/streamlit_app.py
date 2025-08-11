@@ -66,6 +66,35 @@ def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None
         repo.create_file(file_path, "create chat history", "area,modo,pergunta,resposta\n" + nova_linha)
 
 def llm_sidebar_consultation() -> None:
+    # ==== CSS para Sidebar mais larga e texto estilizado ====
+    st.markdown(
+        """
+        <style>
+            /* Largura maior para a sidebar */
+            [data-testid="stSidebar"] {
+                min-width: 420px;
+                max-width: 420px;
+            }
+    
+            /* Estilo do título da sidebar */
+            .sidebar-title {
+                font-size: 20px;
+                font-weight: bold;
+                line-height: 1.3;
+                margin-bottom: 8px;
+            }
+    
+            /* Estilo do subtítulo da sidebar */
+            .sidebar-subtitle {
+                font-size: 16px;
+                font-weight: normal;
+                color: #444;
+                margin-bottom: 16px;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
 
     """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
     contextos = get_contextos()

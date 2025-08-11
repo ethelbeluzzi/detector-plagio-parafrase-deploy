@@ -97,6 +97,7 @@ def llm_sidebar_consultation() -> None:
     )
 
     """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
+    get_contextos.clear()
     contextos = get_contextos()
 
     # Visual alinhado ao app (fundo branco / separador)

@@ -1,3 +1,13 @@
+# Detector de Plágio e Paráfrase
+
+Este projeto implementa um sistema para **comparar textos** por duas abordagens complementares:  
+- **Léxica** – análise baseada em padrões de palavras (TF-IDF e n-gramas).  
+- **Semântica** – análise baseada no significado (embeddings com `sentence-transformers`).  
+
+O objetivo é combinar essas análises para obter uma avaliação robusta da similaridade textual, útil para detecção de plágio, identificação de paráfrases e comparação de conteúdos de domínio público.  
+
+O projeto foi pensado para rodar **tanto localmente quanto via Docker**, garantindo que o ambiente seja reprodutível e que os resultados sejam consistentes.
+
 Otimização da Imagem Docker
 Para manter a imagem leve e rápida:
 

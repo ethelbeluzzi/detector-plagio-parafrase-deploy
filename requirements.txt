@@ -1,4 +1,4 @@
-numpy
+numpy<2
 pandas
 scikit-learn
 scipy
@@ -9,3 +9,4 @@ torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 transformers
 streamlit
 pytest
+typing_extensions

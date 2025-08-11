@@ -26,26 +26,25 @@ Trabalho doméstico, Trabalho de cuidado, Mulheres no Brasil, Igualdade de gêne
 
 ---
 
-## Estrutura de Pastas
+## Estrutura do Projeto
 
 app/                 
-data/                
-  indexes/
-    lexical/
-    semantic/
-  raw/
-src/                 
-  compare_lexical.py
-  compare_semantic.py
-  combine_scores.py
-  compare_service.py
-  config.py
-  io_utils.py
-  pipeline_build_index.py
-  preprocess.py
-tests/               
-Dockerfile
-
+├── data/                
+│   ├── indexes/
+│   │   ├── lexical/
+│   │   └── semantic/
+│   └── raw/
+├── src/                 
+│   ├── compare_lexical.py
+│   ├── compare_semantic.py
+│   ├── combine_scores.py
+│   ├── compare_service.py
+│   ├── config.py
+│   ├── io_utils.py
+│   ├── pipeline_build_index.py
+│   └── preprocess.py
+├── tests/               
+└── Dockerfile
 
 ---
 

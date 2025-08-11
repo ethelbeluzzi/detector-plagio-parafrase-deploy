@@ -390,6 +390,24 @@ def main():
     # Sidebar de LLM (sempre disponível)
     llm_sidebar_consultation()
 
+    st.markdown(
+        """
+        <hr>
+        <div style="display: flex; align-items: center; gap: 12px; font-size: 16px;">
+            <span>Quer saber mais sobre a autora?</span>
+            <a href="http://lattes.cnpq.br/8943675734808684" target="_blank" title="Currículo Lattes">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/lattes.svg" 
+                     alt="Lattes" width="26" height="26" style="vertical-align: middle;">
+            </a>
+            <a href="https://www.linkedin.com/in/ethelpanitsabeluzzi/" target="_blank" title="LinkedIn">
+                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" 
+                     alt="LinkedIn" width="26" height="26" style="vertical-align: middle;">
+            </a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
 
 if __name__ == "__main__":
     main()

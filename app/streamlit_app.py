@@ -21,26 +21,25 @@ from src.config import settings
 
 @st.cache_resource
 @st.cache_resource
+@st.cache_resource
 def get_contextos() -> Dict[str, str]:
     """Carrega todos os .txt da pasta contextos/ (na raiz do projeto)."""
     contextos: Dict[str, str] = {}
     pasta = ROOT / "contextos"
 
     if not pasta.exists():
-        st.sidebar.warning(f"Pasta não encontrada: {pasta}")
         return contextos
 
     for arquivo in os.listdir(pasta):
-        if arquivo.lower().endswith(".txt"):  # garante minúsculas
+        if arquivo.lower().endswith(".txt"):
             nome = os.path.splitext(arquivo)[0]
+            nome_formatado = nome.replace("_", " ").title()  # deixa bonito
             try:
                 with open(pasta / arquivo, "r", encoding="utf-8", errors="ignore") as f:
-                    contextos[nome] = f.read().strip()
-            except Exception as e:
-                st.sidebar.error(f"Erro ao ler {arquivo}: {e}")
+                    contextos[nome_formatado] = f.read().strip()
+            except Exception:
+                pass
 
-    # Debug para confirmar o que foi carregado
-    st.sidebar.write("Contextos carregados:", list(contextos.keys()))
     return contextos
 
 def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None:

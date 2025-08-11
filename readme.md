@@ -75,6 +75,24 @@ docker run --rm -p 8501:8501 detector-plagio-parafrase
 ```
 Acesse no navegador: **http://localhost:8501**
 
+---
+
+## 🖥️ Como usar a interface
+
+1. Abra o navegador e acesse **http://localhost:8501** (tanto no modo local quanto no Docker).  
+2. Na página inicial, você verá:
+   - Um campo de texto **"Cole o texto para análise"**.
+   - Um botão **"Comparar"**.
+3. Cole o texto que deseja analisar no campo indicado.  
+4. Clique em **Comparar** para iniciar a análise.  
+5. A página exibirá:
+   - **Veredito**: indicando se há plágio literal, paráfrase ou nenhum caso detectado, com referência ao documento base.
+   - **Texto analisado com destaques**: trechos em vermelho para plágio literal e em amarelo para paráfrase.
+6. Para ver mais detalhes, clique no *expander* **"Ver blocos e scores detalhados"**:
+   - **Blocos mais suspeitos** – tabela com blocos detectados, documento base, classificação, score final e scores léxico/semântico brutos.
+   - **Mais similares (Léxico)** – ranking dos blocos com maior similaridade léxica.
+   - **Mais similares (Semântico)** – ranking dos blocos com maior similaridade semântica.
+7. Use essas tabelas para inspecionar quais partes do texto tiveram maior proximidade com o corpus.
 
 ---
 

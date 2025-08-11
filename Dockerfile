@@ -47,13 +47,11 @@ COPY src/ /app/src/
 COPY app/ /app/app/
 COPY data/ /app/data/
 
-# Copia o modelo local
-COPY models/ /app/models/
-
 EXPOSE 8501
 
 # Rodar Streamlit acessível pelo host e mostrar localhost no log
 CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.serverAddress=localhost"]
+
 
 
 

@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # instala PyTorch CPU-only primeiro para evitar versão GPU pesada
-RUN pip install torch==2.0.1+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+RUN pip install torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
 # instala demais dependências (melhor uso de cache)
 COPY requirements.txt /app/requirements.txt

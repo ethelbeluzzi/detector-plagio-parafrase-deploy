@@ -2,15 +2,13 @@ import functools
 from typing import List, Tuple
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
-import os
 
-# Define pasta de cache do Hugging Face (mesmo que no Dockerfile/variável de ambiente)
-HF_CACHE_DIR = os.getenv("HF_HOME", "/app/.cache/huggingface")
-
-@functools.lru_cache(maxsize=1)
+# Carregamento lazy + cache do modelo para evitar download/instancia repetida
+@functools.lru_cache(maxsize=2)
 def _get_model(model_name: str):
-    from sentence_transformers import SentenceTransformer
-    return SentenceTransformer(model_name, cache_folder=HF_CACHE_DIR)
+    from sentence_transformers import SentenceTransformer  # import tardio
+    return SentenceTransformer(model_name)
+
 
 def embed_texts(texts: List[str], model_name: str) -> np.ndarray:
     """
@@ -19,6 +17,7 @@ def embed_texts(texts: List[str], model_name: str) -> np.ndarray:
     model = _get_model(model_name)
     emb = model.encode(texts, convert_to_numpy=True, normalize_embeddings=True)
     return emb
+
 
 def semantic_top_k(
     query_block: str,

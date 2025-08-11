@@ -1,0 +1,9 @@
+Otimização da Imagem Docker
+Para manter a imagem leve e rápida:
+
+python:3.11-slim – Reduz significativamente o tamanho em relação à imagem padrão.
+Build multiestágio – Ferramentas de compilação ficam apenas no estágio de build.
+Instalação mínima – Uso de --no-install-recommends e limpeza do cache do apt.
+PyTorch CPU-only – Elimina dependências de GPU, reduzindo peso e complexidade.
+Sem modelos embutidos – O modelo é baixado no primeiro uso.
+Variáveis otimizadas – PIP_NO_CACHE_DIR=1 e HF_HOME configurado para cache previsível.

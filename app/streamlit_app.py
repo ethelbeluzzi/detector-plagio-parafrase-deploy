@@ -104,7 +104,7 @@ def llm_sidebar_consultation() -> None:
     st.sidebar.markdown(
     """
     <p style="font-size:18px; font-weight:bold; margin-bottom:0;">
-        🤖 Tem alguma dúvida?<br>
+        Tem alguma dúvida sobre o projeto?<br>
         <span style="font-weight:normal;">Selecione a área e o tipo de resposta.</span>
     </p>
     """,

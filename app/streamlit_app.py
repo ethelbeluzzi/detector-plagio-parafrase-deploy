@@ -145,6 +145,8 @@ Explique de forma clara, didática e acessível, usando apenas o texto abaixo co
 {contextos.get(contexto_escolhido, '')}
 ---
 Pergunta: {user_question}
+
+Responda em até 200 palavras.
 """
                 else:
                     prompt = f"""
@@ -153,6 +155,7 @@ Responda de forma técnica, objetiva e detalhada, como engenheiro de IA, com bas
 {contextos.get(contexto_escolhido, '')}
 ---
 Pergunta: {user_question}
+Responda em até 200 palavras.
 """
 
                 API_URL = "https://router.huggingface.co/together/v1/chat/completions"

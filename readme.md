@@ -10,6 +10,42 @@ O projeto foi pensado para rodar **tanto localmente quanto via Docker**, garanti
 
 ---
 
+# Como usar este repositório
+
+## Como usar este repositório
+
+### Copiar o repositório para o seu computador
+Primeiro, é necessário copiar o repositório. Depois, você pode escolher rodar localmente ou com docker.
+
+```bash
+git clone https://github.com/ethelbeluzzi/detector-plagio-parafrase.git
+cd detector-plagio-parafrase
+
+### 1) Rodar localmente
+# Criar ambiente virtual e instalar dependências
+python -m venv .venv
+# Linux: source .venv/bin/activate     # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+
+# Construir índices (lê data/raw e salva em data/indexes)
+python -m src.pipeline_build_index
+
+# Iniciar a interface web
+streamlit run app/streamlit_app.py
+
+### 2) Rodar com docker
+
+# Criar imagem
+docker build -t detector-plagio-parafrase .
+
+# Executar container
+docker run --rm -p 8501:8501 detector-plagio-parafrase
+
+
+---
+
+# Mais sobre o Projeto
+
 ## Seleção da Base de Comparação
 
 Para compor a base pública do projeto, optou-se por utilizar textos brutos obtidos da **Wikipédia em português**, por meio de um script automatizado que consulta a API pública da plataforma.  

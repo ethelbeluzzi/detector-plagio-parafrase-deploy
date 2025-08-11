@@ -160,7 +160,7 @@ Pergunta: {user_question}
                     "model": "Qwen/Qwen2.5-7B-Instruct-Turbo",
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.3,
-                    "max_tokens": 300
+                    "max_tokens": 500
                 }
 
                 response = requests.post(API_URL, headers=headers, json=payload, timeout=30)

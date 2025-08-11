@@ -61,11 +61,6 @@ streamlit run app/streamlit_app.py
 ```
 Acesse no navegador: **http://localhost:8501**
 
-[OPCIONAL] Se quiser reconstruir os índices (lê `data/raw` e salva em `data/indexes`):
-```bash
-python -m src.pipeline_build_index
-```
----
 
 ### 🐳 2) Rodar com Docker
 

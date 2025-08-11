@@ -21,10 +21,10 @@ A execução contínua no **GitHub Actions** confirma, em cada *pipeline*, que t
 ## Dockerfile
 - Este projeto usa estratégias para manter a imagem Docker **leve** com `python:3.11-slim`:
 
-- **Imagem base enxuta**: `python:3.11-slim` reduz centenas de MB em relação à imagem padrão.
-- **Build multiestágio**: ferramentas de compilação ficam só no estágio de build, não no runtime.
-- **Instalação mínima**: `--no-install-recommends` e limpeza do cache do apt.
-- **PyTorch CPU-only**: evita dependências GPU pesadas.
-- **Sem modelos embutidos**: o Hugging Face baixa no primeiro uso, mantendo a imagem pequena.
-- **Variáveis otimizadas**: `PIP_NO_CACHE_DIR=1` e `HF_HOME` para cache previsível.
+- **Imagem base enxuta** - `python:3.11-slim` reduz centenas de MB em relação à imagem padrão.
+- **Build multiestágio** - ferramentas de compilação ficam só no estágio de build, não no runtime.
+- **Instalação mínima** - `--no-install-recommends` e limpeza do cache do apt.
+- **PyTorch CPU-only** - evita dependências GPU pesadas.
+- **Sem modelos embutidos** - o Hugging Face baixa no primeiro uso, mantendo a imagem pequena.
+- **Variáveis otimizadas** - `PIP_NO_CACHE_DIR=1` e `HF_HOME` para cache previsível.
 

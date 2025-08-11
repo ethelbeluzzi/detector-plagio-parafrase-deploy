@@ -305,7 +305,7 @@ def main():
     logo_file = ROOT / "app" / "letrus.png"
     with open(logo_file, "rb") as f:
         logo_base64 = base64.b64encode(f.read()).decode()
-
+    
     st.markdown(f"""
     <style>
       .app-header {{
@@ -314,32 +314,53 @@ def main():
         align-items: center;
         padding: 10px 16px;
         background: white;
-        border-bottom: 2px solid #c2c0b8; /* linha separadora */
+        border-bottom: 2px solid #c2c0b8;
+      }}
+      .left-group {{
+        display: flex;
+        align-items: center;
+        gap: 20px;
       }}
       .app-title {{
-        margin: 0;
         font-family: Georgia, "Times New Roman", serif;
         font-size: 18px;
         font-weight: 600;
         letter-spacing: .2px;
         color: #2b2b2b;
       }}
-      .app-logo {{
-        height: 44px;
-        object-fit: contain;
-        margin-left: 16px;
+      .author-box {{
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        padding: 4px 8px;
       }}
-      h1 {{
-        font-size: 32px !important;
-        margin-top: 10px !important;
+      .author-box a {{
+        text-decoration: none;
+      }}
+      .author-box img {{
+        vertical-align: middle;
       }}
     </style>
-
+    
     <div class="app-header">
-      <div class="app-title">Case Técnico - Ethel Beluzzi</div>
+      <div class="left-group">
+        <div class="app-title">Case Técnico - Ethel Beluzzi</div>
+        <div class="author-box">
+          <span>Quer saber mais?</span>
+          <a href="http://lattes.cnpq.br/8943675734808684" target="_blank" title="Currículo Lattes">📄</a>
+          <a href="https://www.linkedin.com/in/ethelpanitsabeluzzi/" target="_blank" title="LinkedIn">
+            <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" width="18" height="18">
+          </a>
+        </div>
+      </div>
       <img class="app-logo" src="data:image/png;base64,{logo_base64}" alt="Logo Letrus" />
     </div>
     """, unsafe_allow_html=True)
+
 
     st.title("🔍 Comparador de Similaridade de Textos")
 
@@ -389,47 +410,6 @@ def main():
 
     # Sidebar de LLM (sempre disponível)
     llm_sidebar_consultation()
-
-    st.markdown(
-        """
-        <style>
-            .fixed-footer {
-                position: fixed;
-                bottom: 15px;
-                right: 20px;
-                background: white;
-                border: 1px solid #ddd;
-                border-radius: 8px;
-                padding: 8px 12px;
-                font-size: 14px;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-                z-index: 9999;
-            }
-            .fixed-footer img {
-                vertical-align: middle;
-            }
-            .fixed-footer a {
-                text-decoration: none;
-            }
-        </style>
-    
-        <div class="fixed-footer">
-            <span>Quer saber mais sobre a autora?</span>
-            <a href="http://lattes.cnpq.br/8943675734808684" target="_blank" title="Currículo Lattes">
-                📄
-            </a>
-            <a href="https://www.linkedin.com/in/ethelpanitsabeluzzi/" target="_blank" title="LinkedIn">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" 
-                     alt="LinkedIn" width="20" height="20">
-            </a>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
 
 
 if __name__ == "__main__":

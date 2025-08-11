@@ -1,44 +1,54 @@
-from src import combine_scores
+import pytest
+from src.combine_scores import combine_scores
 
 
+# 🔹 Testa a combinação e ordenação básica dos scores
+# Aqui doc_b deve ser o primeiro pois tem melhor média ponderada
 def test_combine_scores_basic():
-    # Resultados léxicos simulados (doc_id, score)
-    top_lex = [
-        ("doc1", 0.9),
-        ("doc2", 0.5),
-        ("doc3", 0.2)
-    ]
+    top_lex = [("doc_a", 0.9), ("doc_b", 0.4)]
+    top_sem = [("doc_a", 0.8), ("doc_b", 0.95)]
 
-    # Resultados semânticos simulados (doc_id, score)
-    top_sem = [
-        ("doc1", 0.4),
-        ("doc2", 0.8),
-        ("doc3", 0.3)
-    ]
+    result = combine_scores(top_lex, top_sem, k_final=2, alpha=0.5)
 
-    # Executa combinação
-    results = combine_scores.combine_scores(
-        top_lex, top_sem, k_final=3, alpha=0.5, tau_lex=0.8, tau_sem=0.7
-    )
+    assert len(result) == 2
+    assert result[0]["doc_id"] == "doc_b"
+    assert result[1]["doc_id"] == "doc_a"
+    # Garante que os campos básicos estão presentes
+    for r in result:
+        assert all(k in r for k in ["score_final", "score_lex_raw", "score_sem_raw", "flags"])
 
-    # Deve retornar exatamente k_final elementos
-    assert len(results) == 3
 
-    # Estrutura: (doc_id, score_final, score_lex, score_sem, flags)
-    for item in results:
-        assert isinstance(item[0], str)       # doc_id
-        assert isinstance(item[1], float)     # score_final
-        assert isinstance(item[2], float)     # score_lex normalizado
-        assert isinstance(item[3], float)     # score_sem normalizado
-        assert isinstance(item[4], list)      # flags
+# 🔹 Testa retorno vazio quando não há entradas
+def test_combine_scores_empty_inputs():
+    assert combine_scores([], [], k_final=3) == []
 
-    # Flags aplicados corretamente
-    flags_doc1 = [r[4] for r in results if r[0] == "doc1"][0]
-    assert "plagio_literal" in flags_doc1
-    # doc2 tem alto score semântico normalizado, então deve ter "parafrase"
-    flags_doc2 = [r[4] for r in results if r[0] == "doc2"][0]
-    assert "parafrase" in flags_doc2
 
-    # Ordenação por score_final decrescente
-    scores = [r[1] for r in results]
-    assert scores == sorted(scores, reverse=True)
+# 🔹 Testa detecção de plágio literal (altos em ambos eixos)
+def test_combine_scores_detect_plagio_literal():
+    top_lex = [("doc_a", 0.95)]
+    top_sem = [("doc_a", 0.9)]
+
+    result = combine_scores(top_lex, top_sem, k_final=1, tau_lex=0.9, tau_sem=0.85)
+    assert "plagio_literal" in result[0]["flags"]
+    assert result[0]["match_type"] == "plagio_literal"
+
+
+# 🔹 Testa detecção de paráfrase (semântico alto, léxico relativamente baixo)
+def test_combine_scores_detect_parafrase():
+    top_lex = [("doc_a", 0.5)]
+    top_sem = [("doc_a", 0.9)]
+
+    result = combine_scores(top_lex, top_sem, k_final=1, tau_lex=0.9, tau_sem=0.85, delta_para=0.3)
+    assert "parafrase" in result[0]["flags"]
+    assert result[0]["match_type"] == "parafrase"
+
+
+# 🔹 Testa que o min_gate filtra candidatos fracos
+def test_combine_scores_min_gate_filter():
+    top_lex = [("doc_a", 0.05)]
+    top_sem = [("doc_a", 0.04)]  # ambos abaixo de min_gate padrão (0.1)
+
+    result = combine_scores(top_lex, top_sem, k_final=1)
+    assert result[0]["flags"] == []
+    assert result[0]["match_type"] is None
+

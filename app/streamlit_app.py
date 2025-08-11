@@ -20,17 +20,27 @@ from src.config import settings
 # ========= LLM Sidebar (categorias + modos + GitHub) =========
 
 @st.cache_resource
+@st.cache_resource
 def get_contextos() -> Dict[str, str]:
     """Carrega todos os .txt da pasta contextos/ (na raiz do projeto)."""
     contextos: Dict[str, str] = {}
     pasta = ROOT / "contextos"
+
     if not pasta.exists():
+        st.sidebar.warning(f"Pasta não encontrada: {pasta}")
         return contextos
+
     for arquivo in os.listdir(pasta):
-        if arquivo.endswith(".txt"):
+        if arquivo.lower().endswith(".txt"):  # garante minúsculas
             nome = os.path.splitext(arquivo)[0]
-            with open(pasta / arquivo, "r", encoding="utf-8") as f:
-                contextos[nome] = f.read().strip()
+            try:
+                with open(pasta / arquivo, "r", encoding="utf-8", errors="ignore") as f:
+                    contextos[nome] = f.read().strip()
+            except Exception as e:
+                st.sidebar.error(f"Erro ao ler {arquivo}: {e}")
+
+    # Debug para confirmar o que foi carregado
+    st.sidebar.write("Contextos carregados:", list(contextos.keys()))
     return contextos
 
 def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None:
@@ -57,10 +67,6 @@ def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None
         repo.create_file(file_path, "create chat history", "area,modo,pergunta,resposta\n" + nova_linha)
 
 def llm_sidebar_consultation() -> None:
-    st.sidebar.write("ROOT detectado:", ROOT)
-    pasta = ROOT / "contextos"
-    st.sidebar.write("Existe pasta contextos?:", pasta.exists())
-    st.sidebar.write("Arquivos .txt encontrados:", list(pasta.glob("*.txt")))
 
     """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
     contextos = get_contextos()

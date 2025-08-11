@@ -42,8 +42,10 @@ def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None
     g = Github(token)
     repo = g.get_repo(repo_name)
     # Escapa quebras de linha e vírgulas básicas
-    def _clean(s: str) -> str:
-        return s.replace("\n", " ").replace("\r", " ").replace(",", " ").strip()
+    def _clean(s) -> str:
+    if s is None:
+        return ""
+    return str(s).replace("\n", " ").replace("\r", " ").replace(",", " ").strip()
 
     nova_linha = f"{_clean(area)},{_clean(modo)},{_clean(pergunta)},{_clean(resposta)}\n"
 
@@ -59,9 +61,7 @@ def llm_sidebar_consultation() -> None:
     contextos = get_contextos()
 
     # Visual alinhado ao app (fundo branco / separador)
-    st.sidebar.image(str(ROOT / "app" / "letrus.png"), use_container_width=True)
-    st.sidebar.markdown("---")
-    st.sidebar.markdown("🤖 **Tem alguma dúvida?** Selecione a área e o tipo de resposta.")
+    st.sidebar.markdown("✏️ **Tem alguma dúvidas sobre o projeto?** Selecione a área e o tipo de resposta.")
 
     # Categorias (menu suspenso): "geral" no topo, demais em ordem alfabética
     todas = list(contextos.keys())

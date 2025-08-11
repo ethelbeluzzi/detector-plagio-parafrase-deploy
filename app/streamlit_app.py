@@ -392,21 +392,44 @@ def main():
 
     st.markdown(
         """
-        <hr>
-        <div style="display: flex; align-items: center; gap: 12px; font-size: 16px;">
+        <style>
+            .fixed-footer {
+                position: fixed;
+                bottom: 15px;
+                right: 20px;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 8px;
+                padding: 8px 12px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+                z-index: 9999;
+            }
+            .fixed-footer img {
+                vertical-align: middle;
+            }
+            .fixed-footer a {
+                text-decoration: none;
+            }
+        </style>
+    
+        <div class="fixed-footer">
             <span>Quer saber mais sobre a autora?</span>
             <a href="http://lattes.cnpq.br/8943675734808684" target="_blank" title="Currículo Lattes">
-                <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/lattes.svg" 
-                     alt="Lattes" width="26" height="26" style="vertical-align: middle;">
+                📄
             </a>
             <a href="https://www.linkedin.com/in/ethelpanitsabeluzzi/" target="_blank" title="LinkedIn">
                 <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/linkedin.svg" 
-                     alt="LinkedIn" width="26" height="26" style="vertical-align: middle;">
+                     alt="LinkedIn" width="20" height="20">
             </a>
         </div>
         """,
         unsafe_allow_html=True
     )
+
 
 
 if __name__ == "__main__":

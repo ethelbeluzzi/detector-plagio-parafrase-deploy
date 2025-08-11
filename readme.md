@@ -16,4 +16,15 @@ A execução contínua no **GitHub Actions** confirma, em cada *pipeline*, que t
 - **pipeline_build_index / io_utils** – asseguram que o processo de indexação e persistência gere as estruturas esperadas de forma segura e reprodutível, sem efeitos colaterais no sistema de arquivos.  
 - **preprocess** – confirma a segmentação e manipulação textual, cobrindo cenários típicos e casos de borda para janelas deslizantes e margens de contexto.  
 - **config** – garante a correta leitura e aplicação de parâmetros vindos de variáveis de ambiente, preservando *defaults* quando necessário.  
-- **compare_service** – valida a orquestração completa do fluxo de comparação, verificando a integração entre os módulos e a estrutura final do retorno.  
+- **compare_service** – valida a orquestração completa do fluxo de comparação, verificando a integração entre os módulos e a estrutura final do retorno.
+
+## Dockerfile
+- Este projeto usa estratégias para manter a imagem Docker **leve** com `python:3.11-slim`:
+
+- **Imagem base enxuta**: `python:3.11-slim` reduz centenas de MB em relação à imagem padrão.
+- **Build multiestágio**: ferramentas de compilação ficam só no estágio de build, não no runtime.
+- **Instalação mínima**: `--no-install-recommends` e limpeza do cache do apt.
+- **PyTorch CPU-only**: evita dependências GPU pesadas.
+- **Sem modelos embutidos**: o Hugging Face baixa no primeiro uso, mantendo a imagem pequena.
+- **Variáveis otimizadas**: `PIP_NO_CACHE_DIR=1` e `HF_HOME` para cache previsível.
+

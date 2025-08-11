@@ -22,24 +22,46 @@ cd detector-plagio-parafrase
 
 ---
 
-### 💻 1) Rodar localmente
+
+### 📥 Copiar o repositório para o seu computador
+Primeiro, é necessário copiar o repositório. Depois, você pode escolher rodar **localmente** ou com **Docker**.
+
 ```bash
-# Criar ambiente virtual
+git clone https://github.com/ethelbeluzzi/detector-plagio-parafrase.git
+cd detector-plagio-parafrase
+```
+
+---
+
+### 💻 1) Rodar localmente
+
+Criar ambiente virtual:
+```bash
 python -m venv .venv
+```
 
-# Ativar ambiente virtual
-# Linux/Mac:
+Ativar ambiente virtual:  
+**Linux/Mac:**
+```bash
 source .venv/bin/activate
-# Windows:
+```
+**Windows:**
+```bash
 .venv\Scripts\activate
+```
 
-# Instalar dependências
+Instalar dependências:
+```bash
 pip install -r requirements.txt
+```
 
-# Construir índices (lê data/raw e salva em data/indexes)
+Construir índices (lê `data/raw` e salva em `data/indexes`):
+```bash
 python -m src.pipeline_build_index
+```
 
-# Iniciar a interface web
+Iniciar a interface web:
+```bash
 streamlit run app/streamlit_app.py
 ```
 Acesse no navegador: **http://localhost:8501**
@@ -47,16 +69,17 @@ Acesse no navegador: **http://localhost:8501**
 ---
 
 ### 🐳 2) Rodar com Docker
-```bash
-# Criar imagem
-docker build -t detector-plagio-parafrase .
 
-# Executar container
+Criar imagem:
+```bash
+docker build -t detector-plagio-parafrase .
+```
+
+Executar container:
+```bash
 docker run --rm -p 8501:8501 detector-plagio-parafrase
 ```
 Acesse no navegador: **http://localhost:8501**
-
----
 
 
 ---

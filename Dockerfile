@@ -1,6 +1,4 @@
-# ============================
-# 1º estágio: Builder
-# ============================
+# ============ 1) Builder ============ 
 FROM python:3.11-slim AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -9,21 +7,21 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /install
 
-# libs mínimas; libgomp1 evita erro de OpenMP em wheels de ML
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libgomp1 git \
   && rm -rf /var/lib/apt/lists/*
 
-# instala PyTorch CPU-only primeiro para evitar versão GPU pesada
-RUN pip install torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
+# PyTorch CPU-only primeiro (compatível com transformers recentes)
+RUN pip install --no-cache-dir torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
-# instala demais dependências no diretório temporário
+# Dependências do projeto
 COPY requirements.txt .
-RUN pip install --prefix=/install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-# ============================
-# 2º estágio: Runtime
-# ============================
+# Congela o ambiente exato que funcionou
+RUN pip freeze > /install/requirements.lock
+
+# ============ 2) Runtime ============ 
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -35,8 +33,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Copia apenas as libs prontas do builder
-COPY --from=builder /install /usr/local
+# Copia TUDO que foi instalado no builder
+COPY --from=builder /usr/local /usr/local
+COPY --from=builder /install/requirements.lock /app/requirements.lock
 
 # Copia o código e dados necessários
 COPY src/ /app/src/
@@ -44,8 +43,8 @@ COPY app/ /app/app/
 COPY data/ /app/data/
 
 EXPOSE 8501
-
 CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=localhost"]
+
 
 
 

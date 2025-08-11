@@ -1,4 +1,4 @@
-# Projeto de Comparação de Textos
+# Detector de Plágio e Paráfrase
 
 Este projeto implementa um sistema para **comparar textos** por duas abordagens complementares:  
 - **Léxica** – análise baseada em padrões de palavras (TF-IDF e n-gramas).  

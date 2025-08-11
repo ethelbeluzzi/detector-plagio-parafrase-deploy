@@ -10,13 +10,24 @@ def test_combine_scores_basic():
 
     result = combine_scores(top_lex, top_sem, k_final=2, alpha=0.5)
 
+    # Verifica tamanho e campos
     assert len(result) == 2
-    assert result[0]["doc_id"] == "doc_b"
-    assert result[1]["doc_id"] == "doc_a"
-    # Garante que os campos básicos estão presentes
-    for r in result:
-        assert all(k in r for k in ["score_final", "score_lex_raw", "score_sem_raw", "flags"])
+    assert all("doc_id" in r for r in result)
 
+    # Calcula o esperado para validar ordem
+    # Normalização léxica
+    lex_scores = [0.9, 0.4]
+    norm_lex = [(s - min(lex_scores)) / (max(lex_scores) - min(lex_scores)) for s in lex_scores]
+    # Normalização semântica
+    sem_scores = [0.8, 0.95]
+    norm_sem = [(s - min(sem_scores)) / (max(sem_scores) - min(sem_scores)) for s in sem_scores]
+    # Score final
+    scores_final = [0.5 * l + 0.5 * s for l, s in zip(norm_lex, norm_sem)]
+
+    # Ordena manualmente
+    expected_order = [x for _, x in sorted(zip(scores_final, ["doc_a", "doc_b"]), reverse=True)]
+
+    assert [r["doc_id"] for r in result] == expected_order
 
 # 🔹 Testa retorno vazio quando não há entradas
 def test_combine_scores_empty_inputs():

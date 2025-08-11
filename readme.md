@@ -19,9 +19,9 @@ A execução contínua no **GitHub Actions** confirma, em cada *pipeline*, que t
 - **compare_service** – valida a orquestração completa do fluxo de comparação, verificando a integração entre os módulos e a estrutura final do retorno.
 
 ## Dockerfile
-- Este projeto usa estratégias para manter a imagem Docker **leve** com `python:3.11-slim`:
+Este projeto usa estratégias para manter a imagem Docker mais **leve**.
 
-- **Imagem base enxuta** - `python:3.11-slim` reduz centenas de MB em relação à imagem padrão.
+- **python:3.11-slim** -  reduz centenas de MB em relação à imagem padrão.
 - **Build multiestágio** - ferramentas de compilação ficam só no estágio de build, não no runtime.
 - **Instalação mínima** - `--no-install-recommends` e limpeza do cache do apt.
 - **PyTorch CPU-only** - evita dependências GPU pesadas.

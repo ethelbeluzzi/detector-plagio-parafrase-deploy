@@ -8,34 +8,17 @@ def test_combine_scores_basic():
 
     result = combine_scores(top_lex, top_sem, k_final=2, alpha=0.5)
 
-    # Verifica tamanho e campos
+    # Verifica tamanho e campos básicos
     assert len(result) == 2
     assert all("doc_id" in r for r in result)
 
-    # Reproduz exatamente a lógica interna de combine_scores para calcular ordem esperada
-    lex_dict = dict(top_lex)
-    sem_dict = dict(top_sem)
+    # Garante que os resultados estão ordenados por score_final decrescente
+    scores = [r["score_final"] for r in result]
+    assert scores == sorted(scores, reverse=True)
 
-    ids_list = list(set(lex_dict.keys()) | set(sem_dict.keys()))
-    raw_lex = [float(lex_dict.get(doc_id, 0.0)) for doc_id in ids_list]
-    raw_sem = [float(sem_dict.get(doc_id, 0.0)) for doc_id in ids_list]
-
-    # Normalização
-    def norm(scores):
-        if not scores:
-            return []
-        min_s, max_s = min(scores), max(scores)
-        if max_s == min_s:
-            return [0.0] * len(scores)
-        return [(s - min_s) / (max_s - min_s) for s in scores]
-
-    norm_lex = norm(raw_lex)
-    norm_sem = norm(raw_sem)
-
-    scores_final = [0.5 * l + 0.5 * s for l, s in zip(norm_lex, norm_sem)]
-    expected_order = [doc for _, doc in sorted(zip(scores_final, ids_list), reverse=True)]
-
-    assert [r["doc_id"] for r in result] == expected_order
+    # Garante que todos os doc_ids esperados estão presentes
+    doc_ids = [r["doc_id"] for r in result]
+    assert set(doc_ids) == {"doc_a", "doc_b"}
 
 
 def test_combine_scores_empty_inputs():

@@ -1,9 +1,12 @@
-import streamlit as st
+import os
 import sys
-from pathlib import Path
-import pandas as pd
-from typing import List, Dict, Tuple
 import base64
+import requests
+from pathlib import Path
+from typing import List, Dict, Tuple
+import pandas as pd
+import streamlit as st
+from github import Github
 
 # --- Caminho do projeto ---
 ROOT = Path(__file__).resolve().parents[1]
@@ -12,6 +15,126 @@ if str(ROOT) not in sys.path:
 
 from src.compare_service import compare
 from src.config import settings
+
+
+# ========= LLM Sidebar (categorias + modos + GitHub) =========
+
+@st.cache_resource
+def get_contextos() -> Dict[str, str]:
+    """Carrega todos os .txt da pasta contextos/ (na raiz do projeto)."""
+    contextos: Dict[str, str] = {}
+    pasta = ROOT / "contextos"
+    if not pasta.exists():
+        return contextos
+    for arquivo in os.listdir(pasta):
+        if arquivo.endswith(".txt"):
+            nome = os.path.splitext(arquivo)[0]
+            with open(pasta / arquivo, "r", encoding="utf-8") as f:
+                contextos[nome] = f.read().strip()
+    return contextos
+
+def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None:
+    """Salva o histórico diretamente no GitHub em CSV (append)."""
+    token = st.secrets["GITHUB_TOKEN"]
+    repo_name = st.secrets["REPO_NAME"]
+    file_path = st.secrets["HISTORICO_PATH"]  # ex.: "logs/chat_history.csv"
+
+    g = Github(token)
+    repo = g.get_repo(repo_name)
+    # Escapa quebras de linha e vírgulas básicas
+    def _clean(s: str) -> str:
+        return s.replace("\n", " ").replace("\r", " ").replace(",", " ").strip()
+
+    nova_linha = f"{_clean(area)},{_clean(modo)},{_clean(pergunta)},{_clean(resposta)}\n"
+
+    try:
+        contents = repo.get_contents(file_path)
+        novo_conteudo = contents.decoded_content.decode() + nova_linha
+        repo.update_file(file_path, "append chat history", novo_conteudo, contents.sha)
+    except Exception:
+        repo.create_file(file_path, "create chat history", "area,modo,pergunta,resposta\n" + nova_linha)
+
+def llm_sidebar_consultation() -> None:
+    """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
+    contextos = get_contextos()
+
+    # Visual alinhado ao app (fundo branco / separador)
+    st.sidebar.image(str(ROOT / "app" / "letrus.png"), use_container_width=True)
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("🤖 **Tem alguma dúvida?** Selecione a área e o tipo de resposta.")
+
+    # Categorias (menu suspenso): "geral" no topo, demais em ordem alfabética
+    todas = list(contextos.keys())
+    if "geral" in todas:
+        outras = sorted([c for c in todas if c != "geral"])
+        opcoes = ["geral"] + outras
+    else:
+        opcoes = sorted(todas)  # fallback
+
+    contexto_escolhido = st.sidebar.selectbox("Área:", opcoes, index=0 if "geral" in opcoes else 0)
+
+    # Modo de resposta (rádio)
+    modo_resposta = st.sidebar.radio(
+        "Formato da resposta:",
+        options=["Explicação", "Resposta Técnica"],
+        horizontal=False
+    )
+
+    # Pergunta
+    user_question = st.sidebar.text_area("Digite sua dúvida abaixo:")
+
+    if st.sidebar.button("Enviar pergunta") and user_question.strip():
+        with st.spinner("Consultando a LLM..."):
+            try:
+                hf_token = st.secrets["HF_TOKEN"]
+                headers = {"Authorization": f"Bearer {hf_token}", "Content-Type": "application/json"}
+
+                # Prompt por modo
+                if modo_resposta == "Explicação":
+                    prompt = f"""
+Explique de forma clara, didática e acessível, usando apenas o texto abaixo como base:
+---
+{contextos.get(contexto_escolhido, '')}
+---
+Pergunta: {user_question}
+"""
+                else:
+                    prompt = f"""
+Responda de forma técnica, objetiva e detalhada, com base apenas no texto abaixo:
+---
+{contextos.get(contexto_escolhido, '')}
+---
+Pergunta: {user_question}
+"""
+
+                API_URL = "https://router.huggingface.co/together/v1/chat/completions"
+                payload = {
+                    "model": "Qwen/Qwen2.5-7B-Instruct-Turbo",
+                    "messages": [{"role": "user", "content": prompt}],
+                    "temperature": 0.3,
+                    "max_tokens": 300
+                }
+
+                response = requests.post(API_URL, headers=headers, json=payload, timeout=30)
+
+                if response.status_code == 200:
+                    result = response.json()
+                    reply = result["choices"][0]["message"]["content"]
+
+                    # Salva no GitHub (apenas histórico; nada é exibido ao usuário além da resposta)
+                    salvar_no_github(contexto_escolhido, modo_resposta, user_question.strip(), reply.strip())
+
+                    st.sidebar.success("📘 Resposta da LLM:")
+                    st.sidebar.markdown(f"> {reply.strip()}")
+                elif response.status_code == 429:
+                    st.sidebar.error("⚠️ Limite de requisições atingido!")
+                else:
+                    st.sidebar.error("❌ Erro inesperado ao consultar a LLM.")
+
+            except Exception as e:
+                st.sidebar.error(f"❌ Erro técnico: {e}")
+
+    st.sidebar.markdown("---")
 
 
 # ========= Helpers de UI =========
@@ -26,7 +149,6 @@ def _merge_overlaps(ranges: List[Tuple[int, int, str]]) -> List[Tuple[int, int, 
         return []
 
     severity = {"plagio_literal": 2, "parafrase": 1}
-    # Ordena por início
     ranges = sorted(ranges, key=lambda x: (x[0], -severity.get(x[2], 0)))
 
     merged: List[Tuple[int, int, str]] = []
@@ -34,10 +156,8 @@ def _merge_overlaps(ranges: List[Tuple[int, int, str]]) -> List[Tuple[int, int, 
 
     for s, e, t in ranges[1:]:
         if s <= cur_e:  # overlap
-            # estende o fim
             if e > cur_e:
                 cur_e = e
-            # escolhe tipo mais severo
             if severity.get(t, 0) > severity.get(cur_t, 0):
                 cur_t = t
         else:
@@ -56,7 +176,6 @@ def _highlight_text(query_text: str, resultados: List[Dict]) -> str:
     words = query_text.split()
     n = len(words)
 
-    # Coleta intervalos suspeitos (em índices de palavra)
     raw_ranges: List[Tuple[int, int, str]] = []
     for r in resultados:
         tipo = r.get("tipo")
@@ -68,26 +187,21 @@ def _highlight_text(query_text: str, resultados: List[Dict]) -> str:
             raw_ranges.append((start_w, end_w, tipo))
 
     if not raw_ranges:
-        # Sem destaques: retorna texto simples
         return "<p>" + " ".join(words) + "</p>"
 
     ranges = _merge_overlaps(raw_ranges)
 
-    # Constrói HTML com marcações
     html_parts = []
     cursor = 0
     for s, e, tipo in ranges:
-        # trecho antes
         if s > cursor:
             html_parts.append(" ".join(words[cursor:s]))
-        # trecho destacado
         chunk = " ".join(words[s:e])
         if tipo == "plagio_literal":
             html_parts.append(f"<mark class='plagio' title='Plágio literal'>{chunk}</mark>")
         else:
             html_parts.append(f"<mark class='parafrase' title='Paráfrase'>{chunk}</mark>")
         cursor = e
-    # restante
     if cursor < n:
         html_parts.append(" ".join(words[cursor:]))
 
@@ -140,23 +254,21 @@ def _build_top_blocks_df(resultados: List[Dict], limit: int = 5) -> pd.DataFrame
 def main():
     st.set_page_config(page_title="Case Tecnico - Ethel", layout="wide")
 
-    # Carrega logo em base64
+    # Header visual
     logo_file = ROOT / "app" / "letrus.png"
     with open(logo_file, "rb") as f:
         logo_base64 = base64.b64encode(f.read()).decode()
 
     st.markdown(f"""
     <style>
-      /* Cabeçalho */
       .app-header {{
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px 16px;
-        background: white;  /* fundo branco */
+        background: white;
         border-bottom: 2px solid #c2c0b8; /* linha separadora */
       }}
-
       .app-title {{
         margin: 0;
         font-family: Georgia, "Times New Roman", serif;
@@ -165,16 +277,14 @@ def main():
         letter-spacing: .2px;
         color: #2b2b2b;
       }}
-
       .app-logo {{
         height: 44px;
         object-fit: contain;
         margin-left: 16px;
       }}
-
-      /* Reduz tamanho do st.title */
       h1 {{
         font-size: 32px !important;
+        margin-top: 10px !important;
       }}
     </style>
 
@@ -182,15 +292,6 @@ def main():
       <div class="app-title">Case Técnico - Ethel Beluzzi</div>
       <img class="app-logo" src="data:image/png;base64,{logo_base64}" alt="Logo Letrus" />
     </div>
-    """, unsafe_allow_html=True)
-    st.markdown("""
-    <style>
-    /* Espaço extra entre o traço do header e o título */
-    h1 {
-        font-size: 32px !important;
-        margin-top: 10px !important;  /* ajuste a altura aqui */
-    }
-    </style>
     """, unsafe_allow_html=True)
 
     st.title("🔍 Comparador de Similaridade de Textos")
@@ -221,70 +322,27 @@ def main():
             st.info("Nenhum bloco suspeito encontrado com os thresholds atuais.")
             return
 
-        # Melhor bloco (ordenado por score_final no serviço)
         best = resultados[0]
         header = _header_from_best(best)
         st.markdown(f"<h2 style='font-size:26px;'>{header}</h2>", unsafe_allow_html=True)
 
-        # Expander com scores e candidatos
         with st.expander("Ver blocos e scores detalhados"):
-            # Blocos mais suspeitos (ranking final)
             st.markdown("### 📌 Blocos mais suspeitos")
-            df_top = pd.DataFrame([
-                {
-                    "🔎 Bloco": f"{r['bloco_id']} ({r['inicio']}-{r['fim']})",
-                    "📄 Documento base": r["melhor_candidato"].get("doc_id", "—"),
-                    "🏷 Classificação": (
-                        "🚨 plágio literal" if r["tipo"] == "plagio_literal"
-                        else "📝 paráfrase" if r["tipo"] == "parafrase"
-                        else "—"
-                    ),
-                    "📊 Score final": f"{r['scores']['final']:.3f}",
-                    "🅻 Léxico (bruto)": f"{r['scores']['lex_raw']:.3f}",
-                    "🆂 Semântico (bruto)": f"{r['scores']['sem_raw']:.3f}",
-                }
-                for r in resultados[:5]
-            ])
-            st.table(df_top)
+            st.table(_build_top_blocks_df(resultados))
 
-            # Mais similares (Léxico) - apenas bruto
-            st.markdown("### 📌 Mais similares (Léxico)")
-            top_lex = sorted(resultados, key=lambda r: r["scores"]["lex_raw"], reverse=True)[:5]
-            df_lex = pd.DataFrame([
-                {
-                    "🔎 Bloco": f"{r['bloco_id']} ({r['inicio']}-{r['fim']})",
-                    "📄 Documento base": r["melhor_candidato"].get("doc_id", "—"),
-                    "🅻 Léxico (bruto)": f"{r['scores']['lex_raw']:.3f}",
-                }
-                for r in top_lex
-            ])
-            st.table(df_lex)
+            st.markdown("### 🖍️ Texto analisado (com destaques)")
+            st.markdown(_highlight_text(query, resultados), unsafe_allow_html=True)
 
-            # Mais similares (Semântico) - apenas bruto
-            st.markdown("### 📌 Mais similares (Semântico)")
-            top_sem = sorted(resultados, key=lambda r: r["scores"]["sem_raw"], reverse=True)[:5]
-            df_sem = pd.DataFrame([
-                {
-                    "🔎 Bloco": f"{r['bloco_id']} ({r['inicio']}-{r['fim']})",
-                    "📄 Documento base": r["melhor_candidato"].get("doc_id", "—"),
-                    "🆂 Semântico (bruto)": f"{r['scores']['sem_raw']:.3f}",
-                }
-                for r in top_sem
-            ])
-            st.table(df_sem)
+            st.markdown("""
+            <div class="legend">
+              <span><i class="bullet plagio"></i>Plágio literal</span>
+              <span><i class="bullet parafrase"></i>Paráfrase</span>
+            </div>
+            """, unsafe_allow_html=True)
 
-        # Texto com destaques
-        st.markdown("### 🖍️ Texto analisado (com destaques)")
-        highlighted = _highlight_text(query, resultados)
-        st.markdown(highlighted, unsafe_allow_html=True)
+    # Sidebar de LLM (sempre disponível)
+    llm_sidebar_consultation()
 
-        # Legenda de cores
-        st.markdown("""
-        <div class="legend">
-          <span><i class="bullet plagio"></i>Plágio literal</span>
-          <span><i class="bullet parafrase"></i>Paráfrase</span>
-        </div>
-        """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()

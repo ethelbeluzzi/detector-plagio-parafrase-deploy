@@ -71,7 +71,15 @@ def llm_sidebar_consultation() -> None:
     contextos = get_contextos()
 
     # Visual alinhado ao app (fundo branco / separador)
-    st.sidebar.markdown("✏️ **Tem alguma dúvidas sobre o projeto?** Selecione a área e o tipo de resposta.")
+    st.sidebar.markdown(
+    """
+    <p style="font-size:18px; font-weight:bold; margin-bottom:0;">
+        🤖 Tem alguma dúvida?<br>
+        <span style="font-weight:normal;">Selecione a área e o tipo de resposta.</span>
+    </p>
+    """,
+    unsafe_allow_html=True
+)
 
     # Categorias (menu suspenso): "geral" no topo, demais em ordem alfabética
     todas = list(contextos.keys())

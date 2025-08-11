@@ -35,27 +35,27 @@ cd detector-plagio-parafrase
 
 ### 💻 1) Rodar localmente
 
-Criar ambiente virtual:
+*Criar ambiente virtual:*
 ```bash
 python -m venv .venv
 ```
 
-Ativar ambiente virtual:  
-**Linux/Mac:**
+*Ativar ambiente virtual:*  
+Linux/Mac:
 ```bash
 source .venv/bin/activate
 ```
-**Windows:**
+Windows:
 ```bash
 .venv\Scripts\activate
 ```
 
-Instalar dependências:
+*Instalar dependências:*
 ```bash
 pip install -r requirements.txt
 ```
 
-Iniciar a interface web:
+*Iniciar a interface web:*
 ```bash
 streamlit run app/streamlit_app.py
 ```

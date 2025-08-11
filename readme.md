@@ -3,6 +3,7 @@ Para compor a base pública do projeto, optamos por utilizar textos brutos obtid
 
 
 ## Testes Automatizados
+
 O projeto possui cobertura sistemática das funções nucleares, com testes desenhados segundo princípios de **isolamento**, **eficiência** e **clareza semântica**.  
 Cada teste é concebido para executar de forma determinística, sem dependências externas de I/O, rede ou estado global, utilizando *fixtures* controladas e *mocks* para simular componentes de maior custo computacional.  
 O conjunto é otimizado para execução rápida, mantendo a legibilidade e a rastreabilidade do comportamento validado.
@@ -10,10 +11,9 @@ O conjunto é otimizado para execução rápida, mantendo a legibilidade e a ras
 A execução contínua no **GitHub Actions** confirma, em cada *pipeline*, que todas as verificações são aprovadas, sustentando a confiabilidade do código em produção.
 
 ### Estrutura dos testes
-- **compare_lexical / compare_semantic** – valida algoritmos de similaridade com *mocks* e dados sintéticos, assegurando isolamento de modelos externos.  
-- **combine_scores** – verifica a lógica de agregação e classificação, eliminando não determinismo decorrente de estruturas não ordenadas.  
-- **pipeline_build_index / io_utils** – avalia fluxos de indexação e persistência com diretórios temporários e *mocks* de armazenamento, garantindo segurança e reprodutibilidade.  
-- **preprocess** – assegura a correta segmentação e manipulação textual, cobrindo cenários limítrofes.  
-- **config** – valida a carga de parâmetros a partir de variáveis de ambiente, confirmando a aplicação de *defaults*.  
-- **compare_service** – testa o fluxo orquestrado de comparação com simulações controladas de todos os módulos dependentes, assegurando integridade estrutural no retorno.  
-
+- **compare_lexical / compare_semantic** – garantem que os cálculos de similaridade e o ranqueamento de resultados funcionem corretamente, respeitando parâmetros como `top_n` e `k` e tratando entradas vazias.  
+- **combine_scores** – valida a correta combinação ponderada de scores léxicos e semânticos, bem como a atribuição dos rótulos de classificação segundo as regras definidas.  
+- **pipeline_build_index / io_utils** – asseguram que o processo de indexação e persistência gere as estruturas esperadas de forma segura e reprodutível, sem efeitos colaterais no sistema de arquivos.  
+- **preprocess** – confirma a segmentação e manipulação textual, cobrindo cenários típicos e casos de borda para janelas deslizantes e margens de contexto.  
+- **config** – garante a correta leitura e aplicação de parâmetros vindos de variáveis de ambiente, preservando *defaults* quando necessário.  
+- **compare_service** – valida a orquestração completa do fluxo de comparação, verificando a integração entre os módulos e a estrutura final do retorno.  

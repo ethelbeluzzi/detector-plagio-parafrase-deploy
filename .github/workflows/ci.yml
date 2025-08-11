@@ -30,3 +30,6 @@ jobs:
         run: |
           cd $GITHUB_WORKSPACE
           pytest -q
+          
+      - name: 🐳 Build da imagem Docker
+        run: docker build -t teste-tecnico .

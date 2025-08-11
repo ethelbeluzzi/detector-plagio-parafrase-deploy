@@ -305,7 +305,7 @@ def main():
     logo_file = ROOT / "app" / "letrus.png"
     with open(logo_file, "rb") as f:
         logo_base64 = base64.b64encode(f.read()).decode()
-    
+        
     st.markdown(f"""
     <style>
       .app-header {{
@@ -343,6 +343,10 @@ def main():
       }}
       .author-box img {{
         vertical-align: middle;
+      }}
+      .app-logo {{
+        height: 44px; /* tamanho fixo como antes */
+        object-fit: contain;
       }}
     </style>
     

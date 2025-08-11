@@ -1,0 +1,15 @@
+Testes Automatizados
+Os testes seguem princípios de isolamento, eficiência e clareza semântica:
+
+Execução determinística, sem dependências externas.
+Uso de mocks para simular partes pesadas do processamento.
+Tempo de execução reduzido, viabilizando integração contínua.
+Cobertura por módulo:
+
+compare_lexical / compare_semantic – Verificam cálculos de similaridade e ranqueamento, inclusive com entradas vazias.
+combine_scores – Testa a fusão ponderada de scores e aplicação correta das classificações.
+pipeline_build_index / io_utils – Garante que a indexação e a persistência sejam reprodutíveis e seguras.
+preprocess – Valida segmentação e manipulação de janelas, incluindo casos de borda.
+config – Testa a leitura de parâmetros e preservação de valores padrão.
+compare_service – Avalia a integração de todas as etapas e a estrutura final do retorno.
+O GitHub Actions executa automaticamente toda a suíte de testes a cada push, bloqueando implantações se houver falhas.

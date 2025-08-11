@@ -18,8 +18,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --no-cache-dir torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Copia requirements e instala dependências (fixando numpy<2)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements-dk.txt .
+RUN pip install --no-cache-dir -r requirements-dk.txt
 
 # Congela dependências para reprodutibilidade
 RUN pip freeze > /install/requirements.lock

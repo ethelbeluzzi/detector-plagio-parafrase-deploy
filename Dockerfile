@@ -1,4 +1,6 @@
-# ============ 1) Builder ============ 
+# ============================
+# 1º estágio: Builder
+# ============================
 FROM python:3.11-slim AS builder
 
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -7,21 +9,24 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 WORKDIR /install
 
+# Dependências de build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential libgomp1 git \
-  && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
-# PyTorch CPU-only primeiro (compatível com transformers recentes)
+# PyTorch CPU-only compatível com transformers recentes
 RUN pip install --no-cache-dir torch==2.2.0+cpu --extra-index-url https://download.pytorch.org/whl/cpu
 
-# Dependências do projeto
+# Copia requirements e instala dependências (fixando numpy<2)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Congela o ambiente exato que funcionou
+# Congela dependências para reprodutibilidade
 RUN pip freeze > /install/requirements.lock
 
-# ============ 2) Runtime ============ 
+# ============================
+# 2º estágio: Runtime
+# ============================
 FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -33,18 +38,22 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Copia TUDO que foi instalado no builder
+# Copia bibliotecas do builder e o lock
 COPY --from=builder /usr/local /usr/local
 COPY --from=builder /install/requirements.lock /app/requirements.lock
 
-# Copia o código e dados necessários
+# Copia código e dados necessários
 COPY src/ /app/src/
 COPY app/ /app/app/
 COPY data/ /app/data/
 
-EXPOSE 8501
-CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.serverAddress=localhost"]
+# Copia o modelo local
+COPY models/ /app/models/
 
+EXPOSE 8501
+
+# Rodar Streamlit acessível pelo host e mostrar localhost no log
+CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port=8501", "--server.address=0.0.0.0", "--browser.serverAddress=localhost"]
 
 
 

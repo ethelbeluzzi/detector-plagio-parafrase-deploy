@@ -5,7 +5,7 @@ scipy
 joblib
 sentence-transformers
 python-dotenv
-torch
+torch --extra-index-url https://download.pytorch.org/whl/cpu
 transformers
 streamlit
 pytest

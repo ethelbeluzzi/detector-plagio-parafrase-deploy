@@ -3,15 +3,17 @@ Para compor a base pública do projeto, optamos por utilizar textos brutos obtid
 
 
 ## Testes Automatizados
-Cada função principal tem pelo menos um teste, seguindo boas práticas de **isolamento**, **rapidez** e **clareza**.  
-Isso significa que cada teste foi pensado para rodar de forma independente, sem depender de arquivos externos, conexões de rede ou estado compartilhado; para executar rapidamente, usando dados pequenos e simulando partes pesadas com *mocks*; e para ser claro, com nomes e cenários que deixam explícito qual comportamento está sendo validado.
+O projeto possui cobertura sistemática das funções nucleares, com testes desenhados segundo princípios de **isolamento**, **eficiência** e **clareza semântica**.  
+Cada teste é concebido para executar de forma determinística, sem dependências externas de I/O, rede ou estado global, utilizando *fixtures* controladas e *mocks* para simular componentes de maior custo computacional.  
+O conjunto é otimizado para execução rápida, mantendo a legibilidade e a rastreabilidade do comportamento validado.
 
-No **GitHub Actions**, é possível verificar que todos os testes passam com sucesso, garantindo a confiabilidade do código.
+A execução contínua no **GitHub Actions** confirma, em cada *pipeline*, que todas as verificações são aprovadas, sustentando a confiabilidade do código em produção.
 
 ### Estrutura dos testes
-- **compare_lexical / compare_semantic** – uso de *mocks* e dados em memória para evitar dependências externas.  
-- **combine_scores** – verificação de ordenação por `score_final` sem depender de `set`, garantindo consistência no CI.  
-- **pipeline_build_index / io_utils** – uso de `tmp_path` e *mocks* para I/O seguro.  
-- **preprocess** – cobertura de casos de borda na manipulação de texto.  
-- **config** – validação de variáveis customizadas e *defaults*.  
-- **compare_service** – teste de orquestração com dependências *mockadas* para retorno determinístico.  
+- **compare_lexical / compare_semantic** – valida algoritmos de similaridade com *mocks* e dados sintéticos, assegurando isolamento de modelos externos.  
+- **combine_scores** – verifica a lógica de agregação e classificação, eliminando não determinismo decorrente de estruturas não ordenadas.  
+- **pipeline_build_index / io_utils** – avalia fluxos de indexação e persistência com diretórios temporários e *mocks* de armazenamento, garantindo segurança e reprodutibilidade.  
+- **preprocess** – assegura a correta segmentação e manipulação textual, cobrindo cenários limítrofes.  
+- **config** – valida a carga de parâmetros a partir de variáveis de ambiente, confirmando a aplicação de *defaults*.  
+- **compare_service** – testa o fluxo orquestrado de comparação com simulações controladas de todos os módulos dependentes, assegurando integridade estrutural no retorno.  
+

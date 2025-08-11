@@ -57,6 +57,11 @@ def salvar_no_github(area: str, modo: str, pergunta: str, resposta: str) -> None
         repo.create_file(file_path, "create chat history", "area,modo,pergunta,resposta\n" + nova_linha)
 
 def llm_sidebar_consultation() -> None:
+    st.sidebar.write("ROOT detectado:", ROOT)
+    pasta = ROOT / "contextos"
+    st.sidebar.write("Existe pasta contextos?:", pasta.exists())
+    st.sidebar.write("Arquivos .txt encontrados:", list(pasta.glob("*.txt")))
+
     """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
     contextos = get_contextos()
 

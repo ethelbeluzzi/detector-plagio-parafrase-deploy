@@ -10,7 +10,7 @@ O projeto foi pensado para rodar **tanto localmente quanto via Docker**, garanti
 
 ---
 
-# ✏️ Como usar este repositório
+## ✏️ Como usar este repositório
 
 ### 📥 Copiar o repositório para o seu computador
 Primeiro, é necessário copiar o repositório. Depois, você pode escolher rodar **localmente** ou com **Docker**.
@@ -56,10 +56,12 @@ docker run --rm -p 8501:8501 detector-plagio-parafrase
 ```
 Acesse no navegador: **http://localhost:8501**
 
+---
+
 
 ---
 
-# Mais sobre o Projeto
+## 💭 Mais sobre o Projeto
 
 ## Seleção da Base de Comparação
 
@@ -79,6 +81,7 @@ Trabalho doméstico, Trabalho de cuidado, Mulheres no Brasil, Igualdade de gêne
 
 ## Estrutura do Projeto
 
+```
 app/                 
 ├── data/                
 │   ├── indexes/
@@ -96,7 +99,7 @@ app/
 │   └── preprocess.py
 ├── tests/               
 └── Dockerfile
-
+```
 ---
 
 ## Detalhamento e motivos da organização

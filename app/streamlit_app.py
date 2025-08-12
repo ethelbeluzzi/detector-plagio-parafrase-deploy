@@ -96,7 +96,7 @@ def llm_sidebar_consultation() -> None:
         unsafe_allow_html=True
     )
 
-    """Sidebar de consulta à LLM com seleção de contexto e modo de resposta."""
+    # 🔹 Removido o texto solto que causava exibição indesejada
     get_contextos.clear()
     contextos = get_contextos()
 
@@ -111,17 +111,17 @@ def llm_sidebar_consultation() -> None:
     unsafe_allow_html=True
 )
 
-    # Categorias (menu suspenso): "geral" no topo, demais em ordem alfabética
+    # Categorias (menu suspenso)
     todas = list(contextos.keys())
     if "geral" in todas:
         outras = sorted([c for c in todas if c != "geral"])
         opcoes = ["geral"] + outras
     else:
-        opcoes = sorted(todas)  # fallback
+        opcoes = sorted(todas)
 
     contexto_escolhido = st.sidebar.selectbox("Área:", opcoes, index=0 if "geral" in opcoes else 0)
 
-    # Modo de resposta (rádio)
+    # Modo de resposta
     modo_resposta = st.sidebar.radio(
         "Formato da resposta:",
         options=["Explicação", "Resposta Técnica"],
@@ -137,7 +137,6 @@ def llm_sidebar_consultation() -> None:
                 hf_token = st.secrets["HF_TOKEN"]
                 headers = {"Authorization": f"Bearer {hf_token}", "Content-Type": "application/json"}
 
-                # Prompt por modo
                 if modo_resposta == "Explicação":
                     prompt = f"""
 Explique de forma clara, didática e acessível, usando apenas o texto abaixo como base:
@@ -172,7 +171,6 @@ Responda em até 200 palavras.
                     result = response.json()
                     reply = result["choices"][0]["message"]["content"]
 
-                    # Salva no GitHub (apenas histórico; nada é exibido ao usuário além da resposta)
                     salvar_no_github(contexto_escolhido, modo_resposta, user_question.strip(), reply.strip())
 
                     st.sidebar.success("📘 Resposta da LLM:")
@@ -398,17 +396,48 @@ def main():
             st.info("Nenhum bloco suspeito encontrado com os thresholds atuais.")
             return
 
+        # Melhor bloco para gerar cabeçalho de veredito
         best = resultados[0]
         header = _header_from_best(best)
         st.markdown(f"<h2 style='font-size:26px;'>{header}</h2>", unsafe_allow_html=True)
 
+        # Expander com detalhes
         with st.expander("Ver blocos e scores detalhados"):
+            # 📌 Blocos mais suspeitos
             st.markdown("### 📌 Blocos mais suspeitos")
             st.table(_build_top_blocks_df(resultados))
 
+            # 📌 Mais similares (Léxico)
+            st.markdown("### 📌 Mais similares (Léxico)")
+            top_lex = sorted(resultados, key=lambda r: r["scores"]["lex_raw"], reverse=True)[:5]
+            df_lex = pd.DataFrame([
+                {
+                    "🔎 Bloco": f"{r['bloco_id']} ({r['inicio']}-{r['fim']})",
+                    "📄 Documento base": r["melhor_candidato"].get("doc_id", "—"),
+                    "🅻 Léxico (bruto)": f"{r['scores']['lex_raw']:.3f}",
+                }
+                for r in top_lex
+            ])
+            st.table(df_lex)
+
+            # 📌 Mais similares (Semântico)
+            st.markdown("### 📌 Mais similares (Semântico)")
+            top_sem = sorted(resultados, key=lambda r: r["scores"]["sem_raw"], reverse=True)[:5]
+            df_sem = pd.DataFrame([
+                {
+                    "🔎 Bloco": f"{r['bloco_id']} ({r['inicio']}-{r['fim']})",
+                    "📄 Documento base": r["melhor_candidato"].get("doc_id", "—"),
+                    "🆂 Semântico (bruto)": f"{r['scores']['sem_raw']:.3f}",
+                }
+                for r in top_sem
+            ])
+            st.table(df_sem)
+
+            # 🖍️ Texto analisado
             st.markdown("### 🖍️ Texto analisado (com destaques)")
             st.markdown(_highlight_text(query, resultados), unsafe_allow_html=True)
 
+            # Legenda de cores
             st.markdown("""
             <div class="legend">
               <span><i class="bullet plagio"></i>Plágio literal</span>
